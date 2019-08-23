@@ -2,7 +2,7 @@ INCLUDE "hardware.inc"
 
 
 SECTION "Vblank", ROM0[$0040]
-	call VblankInt
+	call loadJoypad
 	reti
 
 
@@ -36,8 +36,7 @@ SECTION "Game code", ROM0
 Start:
 .initVars
 	ld a, 0
-	ld [counter], a
-	ld [palette], a
+	ld [joybuttons], a
 .enableInt
 	ld a, 0
 	xor a, IEF_VBLANK
@@ -47,46 +46,50 @@ Start:
 	halt
     jp .lockup
 
-VblankInt:
-.if:
-	ld a, [counter]
-	cp 60
-	jp c, .else
-.then:
-	call SetPalette
-	ld a, 0
-	ld [counter], a
-	jp .end
-.else:
-	add a, 1
-	ld [counter], a
-	jp .end
-.end:
-	ret
-
-SetPalette:
-	ld a, [palette]
-	and a, %00000011
+loadJoypad:
+	; Load upper buttons
+	ld a, P1F_5
+	ld [rP1], a
+	ld a, [rP1]
+	cpl
+	and $0F
+	swap a
 	ld b, a
-
-	REPT 3
-		sla a
-		sla a
-		xor a, b
-	ENDR
-
-	ld[rBGP], a
-
-	ld a, b
-	add a, 1
-	and a, %00000011
-	ld [palette], a
+	; Load lower buttons
+	ld a, P1F_4
+	ld [rP1], a
+	ld a, [rP1]
+	cpl
+	and $0F
+	or a, b
+	; Save loaded buttons
+	ld [joybuttons], a
 	ret
 
+; changePalette:
+; 	call loadJoypad
+; 	ld a, [joybuttons]
+; 	ld b, a
+; .ifUp:
+; 	ld a, b
+; 	and a, P1F_2
+; 	cp a, P1F_2
+; 	jp nz, .ifDown
+; .thenUP:
+; 	jp .end
+; .ifDown:
+; .thenDown:
+; 	jp .end
+; .ifLeft:
+; .thenLeft:
+; 	jp .end
+; .else:
+; 	jp .end
+; .end:
+; 	ld [rBGP], a
+; 	ret
 
 SECTION "Variables", WRAM0
 
-counter:
-	ds 1
-palette:
+joybuttons:
 	ds 1
