@@ -9,9 +9,11 @@ default: build/$(ROM_NAME).gb
 
 run: build/$(ROM_NAME).gb
 	$(EMULATOR) $<
+clean:
+	@rm -r build
 
 build:
-	mkdir -p $@
+	mkdir $@
 
 build/main.o: src/main.asm | build
 	$(GB_ASM) -i $(INCLUDE_DIR)/ -o $@ $<
