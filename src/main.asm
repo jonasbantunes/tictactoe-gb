@@ -3,6 +3,7 @@ INCLUDE "hardware.inc"
 
 SECTION "Vblank", ROM0[$0040]
 	call loadJoypad
+	call changePalette
 	reti
 
 
@@ -51,6 +52,7 @@ loadJoypad:
 	ld a, P1F_5
 	ld [rP1], a
 	ld a, [rP1]
+	ld a, [rP1]
 	cpl
 	and $0F
 	swap a
@@ -59,6 +61,11 @@ loadJoypad:
 	ld a, P1F_4
 	ld [rP1], a
 	ld a, [rP1]
+	ld a, [rP1]
+	ld a, [rP1]
+	ld a, [rP1]
+	ld a, [rP1]
+	ld a, [rP1]
 	cpl
 	and $0F
 	or a, b
@@ -66,28 +73,40 @@ loadJoypad:
 	ld [joybuttons], a
 	ret
 
-; changePalette:
-; 	call loadJoypad
-; 	ld a, [joybuttons]
-; 	ld b, a
-; .ifUp:
-; 	ld a, b
-; 	and a, P1F_2
-; 	cp a, P1F_2
-; 	jp nz, .ifDown
-; .thenUP:
-; 	jp .end
-; .ifDown:
-; .thenDown:
-; 	jp .end
-; .ifLeft:
-; .thenLeft:
-; 	jp .end
-; .else:
-; 	jp .end
-; .end:
-; 	ld [rBGP], a
-; 	ret
+changePalette:
+	ld a, [joybuttons]
+	ld b, a
+.ifUp:
+	bit 6, b
+	jp z, .ifDown
+.thenUP:
+	ld a, %11111111
+	ld [rBGP], a
+	jp .end
+.ifDown:
+	bit 7, b
+	jp z, .ifLeft
+.thenDown:
+	ld a, %00000000
+	ld [rBGP], a
+	jp .end
+.ifLeft:
+	bit 5, b
+	jp z, .ifRight
+.thenLeft:
+	ld a, %01010101
+	ld [rBGP], a
+	jp .end
+.ifRight:
+	bit 4, b
+	jp z, .end
+.thenRight:
+	ld a, %10101010
+	ld [rBGP], a
+	jp .end
+.end:
+	ret
+
 
 SECTION "Variables", WRAM0
 
