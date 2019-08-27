@@ -2,8 +2,6 @@ INCLUDE "hardware.inc"
 
 
 SECTION "Vblank", ROM0[$0040]
-	call loadJoypad
-	call changePalette
 	reti
 
 
@@ -23,92 +21,127 @@ SECTION "Joypad", ROM0[$0060]
 	reti
 
 
-SECTION "Header", ROM0[$100]
-    di
-    jp Start
+SECTION "Entrypoint", ROM0[$100]
+	di
+	jp Start
+
+
+SECTION "Header", ROM0[$104]
 
 REPT $150-$104
-    db 0
+	db 0
 ENDR
 
 
 SECTION "Game code", ROM0
 
 Start:
-.initVars
-	ld a, 0
-	ld [joybuttons], a
-.enableInt
-	ld a, 0
-	xor a, IEF_VBLANK
-	ld [rIE], a
+	call TurnOffLCD
+	call SetPalette
+	call LoadFont
+	call ShowHello
+	call TurnOnLCD
+	call EnableVBlank
 	ei
 .lockup
 	halt
-    jp .lockup
+	jp .lockup
 
-loadJoypad:
-	; Load upper buttons
-	ld a, P1F_5
-	ld [rP1], a
-	ld a, [rP1]
-	ld a, [rP1]
+TurnOffLCD:
+.loop
+	ld a, [rLY]
+	cp a, 144
+	jp c, .loop
+.end
+	ld a, [rLCDC]
 	cpl
-	and $0F
-	swap a
-	ld b, a
-	; Load lower buttons
-	ld a, P1F_4
-	ld [rP1], a
-	ld a, [rP1]
-	ld a, [rP1]
-	ld a, [rP1]
-	ld a, [rP1]
-	ld a, [rP1]
-	ld a, [rP1]
+	or a, LCDCF_ON
 	cpl
-	and $0F
-	or a, b
-	; Save loaded buttons
-	ld [joybuttons], a
+	ld [rLCDC], a
 	ret
 
-changePalette:
-	ld a, [joybuttons]
-	ld b, a
-.ifUp:
-	bit 6, b
-	jp z, .ifDown
-.thenUP:
-	ld a, %11111111
+TurnOnLCD:
+	ld a, [rLCDC]
+	or a, LCDCF_ON
+	or a, LCDCF_BGON
+	ld [rLCDC], a
+	ret
+
+SetPalette:
+	ld a, %11100100
 	ld [rBGP], a
-	jp .end
-.ifDown:
-	bit 7, b
-	jp z, .ifLeft
-.thenDown:
-	ld a, %00000000
-	ld [rBGP], a
-	jp .end
-.ifLeft:
-	bit 5, b
-	jp z, .ifRight
-.thenLeft:
-	ld a, %01010101
-	ld [rBGP], a
-	jp .end
-.ifRight:
-	bit 4, b
+	ret
+
+LoadFont:
+	ld hl, $8000
+	ld de, FontTiles
+	ld bc, FontTilesEnd - FontTiles
+.while
+	ld a, b
+	or c
+	and a
 	jp z, .end
-.thenRight:
-	ld a, %10101010
-	ld [rBGP], a
-	jp .end
-.end:
+.do
+	ld a, [de]
+	inc de
+	ld [hl], a
+	inc hl
+	dec bc
+	jp .while
+.end
+	ret
+
+ShowHello:
+	ld hl, $9800
+	ld bc, hello
+	ld d, 0
+.while
+	ld a, [bc]
+	inc bc
+	and a
+	jp z, .endWhile
+.do
+	ld [hl], a
+	inc hl
+	inc d
+
+.if
+	ld a, d
+	cp 20
+	jp c, .endIf
+.then
+	ld a, l
+	add a, 12
+	ld l, a
+	ld a, h
+	adc a, 0
+	ld h, a
+
+	ld d, 0
+	jp .endIf
+.endIf
+
+	jp .while
+.endWhile
+	ret
+
+EnableVBlank:
+	ld a, [rIE]
+	xor a, IEF_VBLANK
+	ld [rIE], a
 	ret
 
 
-SECTION "Variables", WRAM0
+SECTION "Font", ROM0
 
-joybuttons:
-	ds 1
+FontTiles:
+INCBIN "font.chr"
+FontTilesEnd:
+
+
+SECTION "Constants", ROM0
+
+hello:
+	db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel justo eros. Morbi egestas vehicula elit posuere viverra. Sed vel tempus est. Aliquam posuere condimentum nibh, vel congue dolor maximus malesuada. Proin iaculis turpis in neque blandi"
+	db "t, non sagittis nisl porttitor. Aliquam auctor faucibus leo a gravida. Morbi hendrerit felis tortor metus."
+	db 0
