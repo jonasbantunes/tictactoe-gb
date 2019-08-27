@@ -1,7 +1,6 @@
 GB_ASM := rgbasm
 GB_LINK := rgblink
 GB_FIX := rgbfix
-INCLUDE_DIR := include
 ROM_NAME := tictactoe
 EMULATOR := bgb64
 
@@ -15,8 +14,8 @@ clean:
 build:
 	mkdir $@
 
-build/main.o: src/main.asm | build
-	$(GB_ASM) -i $(INCLUDE_DIR)/ -o $@ $<
+build/main.o: main.asm | build
+	$(GB_ASM) -o $@ $<
 
 build/$(ROM_NAME).gb: build/main.o
 	$(GB_LINK) -o $@ $<
