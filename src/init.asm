@@ -1,16 +1,41 @@
 SECTION "Game code", ROM0
 
 Start:
+	call CleanWRAM
+	call InitVariables
 	call TurnOffLCD
-	call SetPalette
+	call ClearORM
+	call SetBGPalette
 	call LoadFont
-	call ShowHello
+	call ShowGrid
+	call ShowCursor
 	call TurnOnLCD
 	call EnableVBlank
 	ei
 .lockup
 	halt
 	jp .lockup
+
+CleanWRAM:
+	ld a, 0
+	ld hl, $C000
+.while
+	ld a, h
+	cp $D0
+	jp nc, .end
+.do
+	ld [hl], 0
+	inc hl
+	jp .while
+.end
+	ret
+
+InitVariables:
+	ld a, 4*8
+	ld [cursor_x], a
+	ld a, 5*8
+	ld [cursor_y], a
+	ret
 
 TurnOffLCD:
 .loop
@@ -32,7 +57,7 @@ TurnOnLCD:
 	ld [rLCDC], a
 	ret
 
-SetPalette:
+SetBGPalette:
 	ld a, %11100100
 	ld [rBGP], a
 	ret
@@ -56,7 +81,7 @@ LoadFont:
 .end
 	ret
 
-ShowHello:
+ShowGrid:
 	ld hl, $9800
 	ld bc, hello
 	ld d, 0
@@ -90,6 +115,41 @@ ShowHello:
 .endWhile
 	ret
 
+ClearORM:
+	ld a, 0
+	ld hl, _OAMRAM
+.do
+	ld [hl], 0
+	inc hl
+	inc a
+.while
+	cp a, $9F+1
+	jp c, .do
+.end
+	ret
+
+ShowCursor:
+	ld hl, _OAMRAM
+	ld a, [cursor_x]
+	ld [hl], a
+	inc hl
+	ld a, [cursor_y]
+	ld [hl], a
+	inc hl
+	ld [hl], $40
+	inc hl
+	ld a, 0
+	or a, OAMF_YFLIP
+	ld [hl], a
+
+	ld a, [rLCDC]
+	or a, LCDCF_OBJON
+	cpl
+	or a, LCDCF_OBJ16
+	cpl
+	ld [rLCDC], a
+	ret
+
 EnableVBlank:
 	ld a, [rIE]
 	xor a, IEF_VBLANK
@@ -107,45 +167,6 @@ FontTilesEnd:
 SECTION "Constants", ROM0
 
 hello:
-	; db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel justo eros. Morbi egestas vehicula elit posuere viverra. Sed vel tempus est. Aliquam posuere condimentum nibh, vel congue dolor maximus malesuada. Proin iaculis turpis in neque blandi"
-	; db "t, non sagittis nisl porttitor. Aliquam auctor faucibus leo a gravida. Morbi hendrerit felis tortor metus."
-	; db 0
-	; db "Lorem ipsum dolor si"
-	; db "t amet, consectetur "
-	; db "adipiscing elit. Cur"
-	; db "abitur vel justo ero"
-	; db "s. Morbi egestas veh"
-	; db "icula elit posuere v"
-	; db "iverra. Sed vel temp"
-	; db "us est. Aliquam posu"
-	; db "ere condimentum nibh"
-	; db ", vel congue dolor m"
-	; db "aximus malesuada. Pr"
-	; db "oin iaculis turpis i"
-	; db "n neque blandit, non"
-	; db " sagittis nisl portt"
-	; db "itor. Aliquam auctor"
-	; db " faucibus leo a grav"
-	; db "ida. Morbi hendrerit"
-	; db " felis tortor metus."
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "------+------+------"
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "------+------+------"
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
-	; db "      |      |      "
 	db "     YOUR TURN!     "
 	db "                    "
 	db "       |    |       "
@@ -165,3 +186,14 @@ hello:
 	db "                    "
 	db "P1: 0          P2: 0"
 	db 0
+
+
+SECTION "Variables", WRAM0
+
+cursor_x:
+	ds 1
+cursor_y:
+	ds 1
+grid:
+	ds 9
+grid_end:
