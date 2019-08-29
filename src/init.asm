@@ -33,10 +33,10 @@ CleanWRAM:
 	ret
 
 InitVariables:
-	ld a, 4*8
-	ld [cursor_x], a
-	ld a, 5*8
+	ld a, 14*8
 	ld [cursor_y], a
+	ld a, 5*8
+	ld [cursor_x], a
 	ld a, 1
 	ld [marks], a
 	ld a, 2
@@ -140,10 +140,10 @@ ClearORM:
 
 RenderCursor:
 	ld hl, _OAMRAM
-	ld a, [cursor_x]
+	ld a, [cursor_y]
 	ld [hl], a
 	inc hl
-	ld a, [cursor_y]
+	ld a, [cursor_x]
 	ld [hl], a
 	inc hl
 	ld [hl], $40
@@ -290,9 +290,9 @@ hello:
 
 SECTION "Variables", WRAM0
 
-cursor_x:
-	ds 1
 cursor_y:
+	ds 1
+cursor_x:
 	ds 1
 marks:
 	ds 9
