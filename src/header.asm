@@ -7,6 +7,7 @@ SECTION "LCDC", ROM0[$0048]
 
 
 SECTION "Timer", ROM0[$0050]
+	call TimerInt
 	reti
 
 

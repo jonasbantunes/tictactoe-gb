@@ -12,6 +12,7 @@ Start:
 	call LoadMarks
 	call TurnOnLCD
 	call EnableVBlank
+	call EnableTimerInt
 	ei
 .lockup
 	halt
@@ -203,6 +204,32 @@ EnableVBlank:
 	ld [rIE], a
 	ret
 
+EnableTimerInt:
+	ld a, [rTAC]
+	cpl
+	and a, TACF_16KHZ
+	cpl
+	or a, TACF_START
+	ld [rTAC], a
+
+	ld a, [rIE]
+	or a, IEF_TIMER
+	ld [rIE], a
+
+	ret
+
+ToggleCursor:
+	ld a, [cursor_y]
+	ld b, a
+
+	ld hl, _OAMRAM
+	ld a, [hl]
+
+	xor a, b
+	ld [hl], a
+
+	ret
+
 
 SECTION "Font", ROM0
 
@@ -244,3 +271,5 @@ cursor_y:
 marks:
 	ds 9
 marks_end:
+counter:
+	ds 1
