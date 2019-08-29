@@ -9,6 +9,7 @@ Start:
 	call LoadFont
 	call ShowGrid
 	call ShowCursor
+	call LoadMarks
 	call TurnOnLCD
 	call EnableVBlank
 	ei
@@ -150,6 +151,52 @@ ShowCursor:
 	ld [rLCDC], a
 	ret
 
+LoadMarks:
+	ld hl, _OAMRAM + $4
+	ld b, 6*8 ; y-axis
+	ld c, 5*8 ; x-axis
+.while_y
+	ld a, b
+	cp 16*8+1
+	jp nc, .end_y
+.do_y
+.while_x
+	ld a, c
+	cp 15*8+1
+	jp nc, .end_x
+.do_x
+	ld a, b
+	ld [hl], a
+	inc hl
+
+	ld a, c
+	ld [hl], a
+	inc hl
+
+	ld a, $58
+	ld [hl], a
+	inc hl
+
+	ld a, 0
+	ld [hl], a
+	inc hl
+
+	ld a, c
+	add a, 5*8
+	ld c, a
+
+	jp .while_x
+.end_x
+	ld c, 5*8
+
+	ld a, b
+	add a, 5*8
+	ld b, a
+
+	jp .while_y
+.end_y
+	ret
+
 EnableVBlank:
 	ld a, [rIE]
 	xor a, IEF_VBLANK
@@ -194,6 +241,6 @@ cursor_x:
 	ds 1
 cursor_y:
 	ds 1
-grid:
+marks:
 	ds 9
-grid_end:
+marks_end:
