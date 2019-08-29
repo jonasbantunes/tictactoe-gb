@@ -7,9 +7,9 @@ Start:
 	call ClearORM
 	call SetBGPalette
 	call LoadFont
-	call ShowGrid
-	call ShowCursor
-	call LoadMarks
+	call RenderGrid
+	call RenderCursor
+	call RenderMarks
 	call TurnOnLCD
 	call EnableVBlank
 	call EnableTimerInt
@@ -37,6 +37,14 @@ InitVariables:
 	ld [cursor_x], a
 	ld a, 5*8
 	ld [cursor_y], a
+	ld a, 1
+	ld [marks], a
+	ld a, 2
+	ld [marks+1], a
+	ld a, 1
+	ld [marks+3], a
+	ld a, 1
+	ld [marks+6], a
 	ret
 
 TurnOffLCD:
@@ -83,7 +91,7 @@ LoadFont:
 .end
 	ret
 
-ShowGrid:
+RenderGrid:
 	ld hl, $9800
 	ld bc, hello
 	ld d, 0
@@ -130,7 +138,7 @@ ClearORM:
 .end
 	ret
 
-ShowCursor:
+RenderCursor:
 	ld hl, _OAMRAM
 	ld a, [cursor_x]
 	ld [hl], a
@@ -152,10 +160,11 @@ ShowCursor:
 	ld [rLCDC], a
 	ret
 
-LoadMarks:
+RenderMarks:
 	ld hl, _OAMRAM + $4
 	ld b, 6*8 ; y-axis
 	ld c, 5*8 ; x-axis
+	ld de, marks
 .while_y
 	ld a, b
 	cp 16*8+1
@@ -174,7 +183,24 @@ LoadMarks:
 	ld [hl], a
 	inc hl
 
+	ld a, [de]
+	inc de
+.ifMarkedX
+	cp a, 1
+	jp nz, .ifMarkedO
+.thenMarkedX
 	ld a, $58
+	jp .end_if
+.ifMarkedO
+	cp a, 2
+	jp nz, .else
+.thenMarkedO
+	ld a, $4F
+	jp .end_if
+.else
+	ld a, $00
+	jp .end_if
+.end_if
 	ld [hl], a
 	inc hl
 
