@@ -1,6 +1,3 @@
-INCLUDE "hardware.inc"
-
-
 SECTION "Vblank", ROM0[$0040]
 	reti
 
@@ -10,6 +7,7 @@ SECTION "LCDC", ROM0[$0048]
 
 
 SECTION "Timer", ROM0[$0050]
+	call TimerInt
 	reti
 
 
@@ -21,17 +19,13 @@ SECTION "Joypad", ROM0[$0060]
 	reti
 
 
-SECTION "Header", ROM0[$100]
-    di
-    jp Start
+SECTION "Entry", ROM0[$100]
+	di
+	jp Start
+
+
+SECTION "Header", ROM0[$104]
 
 REPT $150-$104
-    db 0
+	db 0
 ENDR
-
-
-SECTION "Game code", ROM0
-
-Start:
-.lockup
-    jp .lockup
