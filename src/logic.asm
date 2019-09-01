@@ -1,9 +1,9 @@
 SECTION "Game logic", ROM0
 
 LogicEntry:
-    jp TurnP1
+    jp PlayerTurn
 
-TurnP1
+PlayerTurn
     ei
     call WaitVblank
     di
@@ -38,22 +38,30 @@ TurnP1
     jp .end
 .ifA
     bit PADB_A, a
-    jp z, .end
+    jp z, .trueEnd
 .thenA
-    call Mark3819
+    call Mark
     jp .end
 .end
-    jp TurnP1
+    jp Decision
+.trueEnd
+    jp PlayerTurn
 
-WaitVblank:
-.do
+Decision:
+    call VerifyWinner
+    ld a, [winner]
+    and a, a ; cp a, 0
+    jp z, PlayerTurn
+    jp ShowWinner
+
+ShowWinner
+    call TurnOffLCD
+    call RenderYouWon
+    call TurnOnLCD
+    ei
+.lockup
     halt
-.while
-    ld a, [rLY]
-    cp 144
-    jp c, .do
-.end
-    ret
+    jp .lockup
 
 Mark:
 .offset
@@ -134,5 +142,41 @@ CursorDown:
     call TurnOffLCD
     call RenderCursor
     call TurnOnLCD
+.end
+    ret
+
+VerifyWinner:
+    ld a, 0
+    ld b, 0    ; counter
+    ld c, $03  ; winner
+.while123
+    ld a, b
+    cp a, 3
+    jp nc, .end123
+.do123
+    ld hl, marks
+    ld a, l
+    add a, b
+    ld l, a
+
+    ld d, [hl]
+    ld a, c
+    and a, d
+    ld c, a
+
+    inc b
+
+    jp .while123
+.end123
+
+.if123Winner
+    ld a, c
+    and a, a  ; cp a, 0
+    jp nz, .winner
+.end123Winner
+
+.winner
+    ld hl, winner
+    ld [hl], a
 .end
     ret

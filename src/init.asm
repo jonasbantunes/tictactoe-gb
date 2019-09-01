@@ -120,3 +120,9 @@ joybuttons:
 	ds 1
 joyhold:
 	ds 1
+player_turn:
+	ds 1
+winner:
+	ds 1
+turns_left:
+	ds 1

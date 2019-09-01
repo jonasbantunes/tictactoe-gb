@@ -1,5 +1,11 @@
 SECTION "Rendering", ROM0
 
+RenderYouWon:
+	ld de, msg_won
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
 RenderTurnP1:
 	ld de, msg_turn_p1
 	ld hl, _SCRN0
@@ -100,6 +106,15 @@ RenderCursor:
 	ld [rLCDC], a
 	ret
 
+ToggleCursor:
+	ld hl, _OAMRAM+3
+	ld a, [hl]
+
+	xor a, %00010000
+	ld [hl], a
+
+	ret
+
 RenderMarks:
 	ld hl, _OAMRAM + $4
 	ld b, 6*8 ; y-axis
@@ -162,15 +177,6 @@ RenderMarks:
 
 	jp .while_y
 .end_y
-	ret
-
-ToggleCursor:
-	ld hl, _OAMRAM+3
-	ld a, [hl]
-
-	xor a, %00010000
-	ld [hl], a
-
 	ret
 
 ToggleMarks:

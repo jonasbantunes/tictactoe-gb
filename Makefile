@@ -18,5 +18,5 @@ build/main.o: main.asm | build
 	$(GB_ASM) -o $@ $<
 
 build/$(ROM_NAME).gb: build/main.o
-	$(GB_LINK) -o $@ $<
+	$(GB_LINK) -n build/$(ROM_NAME).sym -o $@ $<
 	$(GB_FIX) -v -p 0 $@

@@ -27,6 +27,16 @@ CleanWRAM:
 .end
 	ret
 
+WaitVblank:
+.do
+    halt
+.while
+    ld a, [rLY]
+    cp 144
+    jp c, .do
+.end
+    ret
+
 EnableVBlank:
 	ld a, [rIE]
 	xor a, IEF_VBLANK
