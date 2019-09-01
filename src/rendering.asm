@@ -6,6 +6,12 @@ RenderYouWon:
 	call RenderString
 	ret
 
+RenderYouLost:
+	ld de, msg_lost
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
 RenderTurnP1:
 	ld de, msg_turn_p1
 	ld hl, _SCRN0
@@ -113,6 +119,11 @@ ToggleCursor:
 	xor a, %00010000
 	ld [hl], a
 
+	ret
+
+HideCursor:
+	ld a, 0
+	ld [_OAMRAM + 2], a
 	ret
 
 RenderMarks:

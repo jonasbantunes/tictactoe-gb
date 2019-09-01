@@ -41,6 +41,7 @@ PlayerTurn
     jp z, .trueEnd
 .thenA
     call Mark
+    call ChangePlayer
     jp .end
 .end
     jp Decision
@@ -51,17 +52,37 @@ Decision:
     call VerifyWinner
     ld a, [winner]
     and a, a ; cp a, 0
-    jp z, PlayerTurn
+.if
+    jp z, .end
+.then
     jp ShowWinner
+.end
+    jp PlayerTurn
 
 ShowWinner
     call TurnOffLCD
+    call HideCursor
+.if
+    ld a, [winner]
+    cp a, 1
+    jp nz, .else
+.then
     call RenderYouWon
+    jp .end
+.else
+    call RenderYouLost
+.end
     call TurnOnLCD
     ei
 .lockup
     halt
     jp .lockup
+
+ChangePlayer:
+    ld a, [player_turn]
+    xor a, $01
+    ld [player_turn], a
+    ret 
 
 Mark:
 .offset
@@ -81,7 +102,9 @@ Mark:
     ld d, 0
     add hl, de
 
-    ld [hl], 1
+    ld a, [player_turn]
+    add a, 1
+    ld [hl], a
 .update
     call TurnOffLCD
     call RenderMarks
@@ -172,11 +195,15 @@ VerifyWinner:
 .if123Winner
     ld a, c
     and a, a  ; cp a, 0
-    jp nz, .winner
-.end123Winner
-
-.winner
+    jp z, .end123Winner
+.then123Winner
     ld hl, winner
     ld [hl], a
+
+    ld a, 1
+    ld [marks_blink], a
+    ld [marks_blink + 1], a
+    ld [marks_blink + 2], a
+.end123Winner
 .end
     ret
