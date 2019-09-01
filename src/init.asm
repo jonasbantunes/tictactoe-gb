@@ -17,15 +17,17 @@ Start:
 	call EnableVBlank
 	call EnableTimerInt
 	ei
-.lockup
-	halt
-	jp .lockup
+	jp LogicEntry
+; .lockup
+; 	halt
+; 	jp .lockup
 
 InitVariables:
-	ld a, 4*8
+	ld a, 1
 	ld [cursor_y], a
-	ld a, 5*8
+	ld a, 1
 	ld [cursor_x], a
+
 	; ld a, 1
 	; ld [marks], a
 	; ld [marks_blink], a
@@ -114,3 +116,7 @@ counter:
 scores:
 	ds 2
 scores_end:
+joybuttons:
+	ds 1
+joyhold:
+	ds 1

@@ -64,15 +64,30 @@ UpdateScore:
 	ret
 
 RenderCursor:
-	ld hl, _OAMRAM
+	ld hl, 5*8
+	ld d, 0
 	ld a, [cursor_y]
+	ld e, a
+	call Multiply  ; bc = de * hl
+	ld a, c
+	add a, 4*8
+	ld hl, _OAMRAM
 	ld [hl], a
-	inc hl
+
+	ld hl, 5*8
+	ld d, 0
 	ld a, [cursor_x]
+	ld e, a
+	call Multiply  ; bc = de * hl
+	ld a, c
+	add a, 5*8
+	ld hl, _OAMRAM + 1
 	ld [hl], a
-	inc hl
+
+	ld hl, _OAMRAM + 2
 	ld [hl], $40
-	inc hl
+	
+	ld hl, _OAMRAM + 3
 	ld a, 0
 	or a, OAMF_YFLIP
 	ld [hl], a

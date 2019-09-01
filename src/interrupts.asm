@@ -1,5 +1,9 @@
 SECTION "Interruptions", ROM0
 
+VblankInt:
+    call loadJoypad
+    ret
+
 TimerInt:
     ld a, [counter]
     inc a
@@ -9,7 +13,7 @@ TimerInt:
 .then
     call TurnOffLCD
     call ToggleCursor
-    call ToggleMarks
+    ; call ToggleMarks
     call TurnOnLCD
 
     ld a, 0

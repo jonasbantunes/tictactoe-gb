@@ -1,4 +1,5 @@
 SECTION "Vblank", ROM0[$0040]
+	call VblankInt
 	reti
 
 
