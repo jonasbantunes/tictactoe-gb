@@ -9,6 +9,7 @@ TimerInt:
 .then
     call TurnOffLCD
     call ToggleCursor
+    call ToggleMarks
     call TurnOnLCD
 
     ld a, 0
