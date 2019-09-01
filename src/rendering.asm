@@ -150,16 +150,44 @@ RenderMarks:
 	ret
 
 ToggleCursor:
-	ld a, [cursor_y]
-	ld b, a
-
-	ld hl, _OAMRAM
+	ld hl, _OAMRAM+3
 	ld a, [hl]
 
-	xor a, b
+	xor a, %00010000
 	ld [hl], a
 
 	ret
+
+ToggleMarks:
+    ld hl, _OAMRAM + 4 + 3
+    ld de, marks_blink
+    ld b, 0
+.while
+    ld a, b
+    cp a, 9
+    jp nc, .endWhile
+.do
+    ld a, [de]
+    inc de
+.if
+    cp a, 1
+    jp nz, .endIf
+.then
+    ld a, [hl]
+    xor a, %00010000
+    ld [hl], a
+.endIf
+    ld a, l
+    add a, 4
+    ld l, a
+    ld a, h
+    adc a, 0
+    ld h, a
+
+    inc b
+    jp .while
+.endWhile
+    ret
 
 TurnOffLCD:
 .loop
@@ -181,9 +209,14 @@ TurnOnLCD:
 	ld [rLCDC], a
 	ret
 
-SetBGPalette:
+SetPalettes:
 	ld a, %11100100
 	ld [rBGP], a
+    ld a, %11100100
+    ld [rOBP0], a
+    ld a, %00000000
+    ld [rOBP1], a
+
 	ret
 
 LoadFont:

@@ -5,7 +5,7 @@ Start:
 	call InitVariables
 	call TurnOffLCD
 	call ClearORM
-	call SetBGPalette
+	call SetPalettes
 	call LoadFont
 	call RenderTurnP1
 	call RenderGrid
@@ -28,6 +28,7 @@ InitVariables:
 	ld [cursor_x], a
 	ld a, 1
 	ld [marks], a
+	ld [marks_blink], a
 	ld a, 2
 	ld [marks+1], a
 	ld a, 1
@@ -112,3 +113,4 @@ counter:
 	ds 1
 scores:
 	ds 2
+scores_end:
