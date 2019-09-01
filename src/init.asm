@@ -26,19 +26,19 @@ InitVariables:
 	ld [cursor_y], a
 	ld a, 5*8
 	ld [cursor_x], a
-	ld a, 1
-	ld [marks], a
-	ld [marks_blink], a
-	ld a, 2
-	ld [marks+1], a
-	ld a, 1
-	ld [marks+3], a
-	ld a, 1
-	ld [marks+6], a
-	ld a, 3
-	ld [scores], a
-	ld a, 7
-	ld [scores+1], a
+	; ld a, 1
+	; ld [marks], a
+	; ld [marks_blink], a
+	; ld a, 2
+	; ld [marks+1], a
+	; ld a, 1
+	; ld [marks+3], a
+	; ld a, 1
+	; ld [marks+6], a
+	; ld a, 3
+	; ld [scores], a
+	; ld a, 7
+	; ld [scores+1], a
 	ret
 
 
