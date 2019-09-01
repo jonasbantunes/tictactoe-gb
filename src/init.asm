@@ -8,6 +8,7 @@ Start:
 	call SetBGPalette
 	call LoadFont
 	call RenderGrid
+	call UpdateScore
 	call RenderCursor
 	call RenderMarks
 	call TurnOnLCD
@@ -33,7 +34,7 @@ CleanWRAM:
 	ret
 
 InitVariables:
-	ld a, 14*8
+	ld a, 4*8
 	ld [cursor_y], a
 	ld a, 5*8
 	ld [cursor_x], a
@@ -45,6 +46,10 @@ InitVariables:
 	ld [marks+3], a
 	ld a, 1
 	ld [marks+6], a
+	ld a, 3
+	ld [scores], a
+	ld a, 7
+	ld [scores+1], a
 	ret
 
 TurnOffLCD:
@@ -92,8 +97,25 @@ LoadFont:
 	ret
 
 RenderGrid:
-	ld hl, $9800
-	ld bc, hello
+	ld hl, RenderString_arg0
+	ld de, grid
+	ld [hl], d
+	inc hl
+	ld [hl], e
+	inc hl
+
+	call RenderString
+	ret
+
+RenderString:
+.loadAdresses
+	ld a, [RenderString_arg0]
+	ld b, a
+	ld a, [RenderString_arg0+1]
+	ld c, a
+
+	ld hl, $9800 + 32*2
+	; ld bc, grid
 	ld d, 0
 .while
 	ld a, [bc]
@@ -123,6 +145,17 @@ RenderGrid:
 
 	jp .while
 .endWhile
+	ret
+
+UpdateScore:
+	ld a, [scores]
+	add a, $30
+	ld [$9800+32*17+4], a
+
+	ld a, [scores+1]
+	add a, $30
+	ld [$9800+32*17+19], a
+
 	ret
 
 ClearORM:
@@ -266,9 +299,11 @@ FontTilesEnd:
 
 SECTION "Constants", ROM0
 
-hello:
+message:
 	db "     YOUR TURN!     "
 	db "                    "
+	db 0
+grid:
 	db "       |    |       "
 	db "       |    |       "
 	db "       |    |       "
@@ -283,6 +318,8 @@ hello:
 	db "       |    |       "
 	db "       |    |       "
 	db "       |    |       "
+	db 0
+scoreboard:
 	db "                    "
 	db "P1: 0          P2: 0"
 	db 0
@@ -299,3 +336,20 @@ marks:
 marks_end:
 counter:
 	ds 1
+scores:
+	ds 2
+
+SECTION "Arguments", WRAM0
+
+RenderString_arg0:
+	ds 2
+RenderString_arg1:
+	ds 1
+RenderString_arg2:
+	ds 1
+Multiply_arg0:
+	ds 2
+Multiply_arg1:
+	ds 2
+Multiply_out:
+	ds 2
