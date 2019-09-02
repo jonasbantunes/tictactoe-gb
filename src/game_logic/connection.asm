@@ -41,11 +41,13 @@ StartConnection:
     ld a, %10101010
     call SendData
 
-    call EnableVBlank
-    call EnableTimerInt
+    call DisableVBlank
+    call DisableTimerInt
+    call EnableSerial
 .lockup
     ei
-    call WaitVblank
+    ; call WaitVblank
+    halt
     di
 .if
     ld a, [serial_data]

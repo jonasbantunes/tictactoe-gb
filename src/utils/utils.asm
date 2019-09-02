@@ -53,7 +53,7 @@ DisableVBlank:
 
 EnableSerial:
 	ld a, [rIE]
-	xor a, IEF_SERIAL
+	or a, IEF_SERIAL
 	ld [rIE], a
 	ret
 
