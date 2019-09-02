@@ -21,6 +21,8 @@ joyhold:
 	ds 1
 player_turn:
 	ds 1
+player_num:
+	ds 1
 winner:
 	ds 1
 turns_left:

@@ -18,16 +18,6 @@ SECTION "Game code", ROM0
 ; 	ei
 ; 	jp LogicEntry
 
-Start:
-	call CleanWRAM
-	call TurnOffLCD
-	call ClearORM
-	call SetPalettes
-	call LoadFont
-	call TurnOnLCD
-	call ShowBoard
-	jp PlayerTurn
-
 ; Start:
 ; 	call CleanWRAM
 ; 	call TurnOffLCD
@@ -35,4 +25,14 @@ Start:
 ; 	call SetPalettes
 ; 	call LoadFont
 ; 	call TurnOnLCD
-; 	jp AwaitConnection
+; 	call SetupGame
+; 	jp PlayerTurn
+
+Start:
+	call CleanWRAM
+	call TurnOffLCD
+	call ClearORM
+	call SetPalettes
+	call LoadFont
+	call TurnOnLCD
+	jp AwaitConnection

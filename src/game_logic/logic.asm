@@ -75,8 +75,17 @@ Decision:
 .thenWinner
     jp ShowWinner
 .endWinner
-    ; jp OpponentTurn
+.ifPlayerTurn:
+    ld a, [player_turn]
+    ld b, a
+    ld a, [player_num]
+    cp a, b
+    jp nz, .elsePlayerTurn
+.thenPlayerTurn:
     jp PlayerTurn
+.elsePlayerTurn:
+    jp OpponentTurn
+
 
 ShowWinner
     call TurnOffLCD
@@ -121,7 +130,8 @@ Mark:
     ld d, 0
     add hl, de
 
-    ld a, [player_turn]
+    ; ld a, [player_turn]
+    ld a, [player_num]
     add a, 1
     ld [hl], a
 .update
@@ -227,7 +237,7 @@ VerifyWinner:
 .end
     ret
 
-ShowBoard:
+SetupGame:
 	call TurnOffLCD
 	call RenderGrid
 	; call RenderScore
@@ -235,4 +245,9 @@ ShowBoard:
 	call RenderCursor
 	call RenderMarks
 	call TurnOnLCD
+
+    ld a, 0
+    ld [player_turn], a
+    ld a, 0
+    ld [player_num], a
     ret
