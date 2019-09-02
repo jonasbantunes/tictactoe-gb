@@ -10,6 +10,7 @@ SerialInt:
 .then
     ld a, 0
     ld [serial_turn], a
+    call ListenData
     jp .end
 .else
     ld a, [rSB]
