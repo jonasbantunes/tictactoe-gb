@@ -1,16 +1,12 @@
 SECTION "Connection", ROM0
 
-Connect:
+AwaitConnection:
     call TurnOffLCD
     call RenderAwaiting
     call TurnOnLCD
 
     call EnableVBlank
     call EnableSerial
-
-    jp AwaitConnection
-
-AwaitConnection:
     call ListenData
 .lockup
     ei
@@ -53,18 +49,3 @@ AcceptConnection:
     call TurnOnLCD
 .lockup
     jp .lockup
-
-Connected:
-.lockup
-    jp .lockup
-
-SendData:
-    ld [rSB], a
-    ld a, $81
-    ld [rSC], a
-    ret
-
-ListenData:
-    ld a, $80
-    ld [rSC], a
-    ret

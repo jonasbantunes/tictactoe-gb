@@ -39,7 +39,7 @@ WaitVblank:
 
 EnableVBlank:
 	ld a, [rIE]
-	xor a, IEF_VBLANK
+	or a, IEF_VBLANK
 	ld [rIE], a
 	ret
 
@@ -77,6 +77,14 @@ EnableTimerInt:
 	or a, IEF_TIMER
 	ld [rIE], a
 
+	ret
+
+DisableTimerInt:
+	ld a, [rIE]
+	cpl
+	or a, IEF_TIMER
+	cpl
+	ld [rIE], a
 	ret
 
 Multiply:

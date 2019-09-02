@@ -33,3 +33,9 @@ RenderTurnP1:
 	ld hl, _SCRN0
 	call RenderString
 	ret
+
+RenderTurnP2:
+	ld de, msg_turn_p2
+	ld hl, _SCRN0
+	call RenderString
+	ret

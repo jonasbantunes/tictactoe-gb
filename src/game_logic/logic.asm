@@ -4,6 +4,12 @@ LogicEntry:
     jp PlayerTurn
 
 PlayerTurn
+    call TurnOffLCD
+    call RenderTurnP1
+    call TurnOnLCD
+    call EnableVBlank
+    call EnableTimerInt
+.lockup
     ei
     call WaitVblank
     di
@@ -38,25 +44,38 @@ PlayerTurn
     jp .end
 .ifA
     bit PADB_A, a
-    jp z, .trueEnd
+    jp z, .end
 .thenA
     call Mark
     call ChangePlayer
-    jp .end
-.end
     jp Decision
-.trueEnd
-    jp PlayerTurn
+.end
+    jp .lockup
+
+OpponentTurn:
+    call TurnOffLCD
+    call RenderTurnP2
+    call HideCursor
+    call TurnOnLCD
+
+    call DisableTimerInt
+    call DisableVBlank
+    call EnableSerial
+    ei
+.lockup
+    halt
+    jp .lockup
 
 Decision:
     call VerifyWinner
     ld a, [winner]
     and a, a ; cp a, 0
-.if
-    jp z, .end
-.then
+.ifWinner
+    jp z, .endWinner
+.thenWinner
     jp ShowWinner
-.end
+.endWinner
+    ; jp OpponentTurn
     jp PlayerTurn
 
 ShowWinner
@@ -206,4 +225,14 @@ VerifyWinner:
     ld [marks_blink + 2], a
 .end123Winner
 .end
+    ret
+
+ShowBoard:
+	call TurnOffLCD
+	call RenderGrid
+	; call RenderScore
+	; call UpdateScore
+	call RenderCursor
+	call RenderMarks
+	call TurnOnLCD
     ret
