@@ -43,6 +43,28 @@ EnableVBlank:
 	ld [rIE], a
 	ret
 
+DisableVBlank:
+	ld a, [rIE]
+	cpl
+	or a, IEF_VBLANK
+	cpl
+	ld [rIE], a
+	ret
+
+EnableSerial:
+	ld a, [rIE]
+	xor a, IEF_SERIAL
+	ld [rIE], a
+	ret
+
+DisableSerial:
+	ld a, [rIE]
+	cpl
+	or a, IEF_SERIAL
+	cpl 
+	ld [rIE], a
+	ret
+
 EnableTimerInt:
 	ld a, [rTAC]
 	cpl

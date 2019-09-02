@@ -1,47 +1,31 @@
 SECTION "Game code", ROM0
 
+; Start:
+; 	call CleanWRAM
+; 	call TurnOffLCD
+; 	call ClearORM
+; 	call SetPalettes
+; 	call LoadFont
+; 	call RenderTurnP1
+; 	call RenderGrid
+; 	call RenderScore
+; 	call UpdateScore
+; 	call RenderCursor
+; 	call RenderMarks
+; 	call TurnOnLCD
+; 	call EnableVBlank
+; 	call EnableTimerInt
+; 	ei
+; 	jp LogicEntry
+
 Start:
 	call CleanWRAM
-	call InitVariables
 	call TurnOffLCD
 	call ClearORM
 	call SetPalettes
 	call LoadFont
-	call RenderTurnP1
-	call RenderGrid
-	call RenderScore
-	call UpdateScore
-	call RenderCursor
-	call RenderMarks
 	call TurnOnLCD
-	call EnableVBlank
-	call EnableTimerInt
-	ei
-	jp LogicEntry
-; .lockup
-; 	halt
-; 	jp .lockup
-
-InitVariables:
-	ld a, 1
-	ld [cursor_y], a
-	ld a, 1
-	ld [cursor_x], a
-
-	; ld a, 1
-	; ld [marks], a
-	; ld [marks_blink], a
-	; ld a, 2
-	; ld [marks+1], a
-	; ld a, 1
-	; ld [marks+3], a
-	; ld a, 1
-	; ld [marks+6], a
-	; ld a, 3
-	; ld [scores], a
-	; ld a, 7
-	; ld [scores+1], a
-	ret
+	jp Connect
 
 
 SECTION "Font", ROM0
@@ -67,6 +51,10 @@ msg_lost:
 	db 0
 msg_won:
 	db "      YOU WON!      "
+	db "                    "
+	db 0
+msg_awaiting:
+	db "AWAITING  CONNECTION"
 	db "                    "
 	db 0
 msg_connecting:
@@ -125,4 +113,8 @@ player_turn:
 winner:
 	ds 1
 turns_left:
+	ds 1
+serial_data:
+	ds 1
+serial_turn:
 	ds 1

@@ -13,6 +13,7 @@ SECTION "Timer", ROM0[$0050]
 
 
 SECTION "Serial", ROM0[$0058]
+	call SerialInt
 	reti
 
 

@@ -1,5 +1,23 @@
 SECTION "Rendering", ROM0
 
+RenderAwaiting:
+	ld de, msg_awaiting
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
+RenderConnecting:
+	ld de, msg_connecting
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
+RenderConnected:
+	ld de, msg_connected
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
 RenderYouWon:
 	ld de, msg_won
 	ld hl, _SCRN0
