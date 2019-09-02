@@ -1,0 +1,1 @@
+INCLUDE "src/constants/hardware.inc"
