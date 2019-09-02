@@ -8,3 +8,8 @@ ListenData:
     ld a, $80
     ld [rSC], a
     ret
+
+SendMark:
+    ld a, [cursor]
+    call SendData
+    ret

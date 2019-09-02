@@ -1,8 +1,5 @@
 SECTION "Game logic", ROM0
 
-LogicEntry:
-    jp PlayerTurn
-
 PlayerTurn
     call TurnOffLCD
     call RenderTurnP1
@@ -47,6 +44,7 @@ PlayerTurn
     jp z, .end
 .thenA
     call MarkPlayer
+    call SendMark
     call ChangePlayer
     jp Decision
 .end
@@ -59,19 +57,21 @@ OpponentTurn:
     call TurnOnLCD
 
     call DisableTimerInt
-    call DisableVBlank
+    call EnableVBlank
     call EnableSerial
 .lockup
     ei
     halt
     di
-; .if
-;     ld a, [serial_turn]
-;     cp a, 1  ; check if is the internal clock turn
-;     jp nz, .end
-; .then
-
-; .end
+.if
+    ld a, [serial_turn]
+    cp a, 1  ; check if is the internal clock turn
+    jp nz, .end
+.then
+    call MarkOpponent
+    call ChangePlayer
+    jp Decision
+.end
     jp .lockup
 
 Decision:
@@ -99,8 +99,12 @@ ShowWinner
     call TurnOffLCD
     call HideCursor
 .if
+    ld a, [player_num]
+    add a, 1
+    ld b, a
+    
     ld a, [winner]
-    cp a, 1
+    cp a, b
     jp nz, .else
 .then
     call RenderYouWon
@@ -119,128 +123,6 @@ ChangePlayer:
     xor a, $01
     ld [player_turn], a
     ret 
-
-; Calculate offset from cursor axis.
-;
-; Arguments:
-;
-; - `l`: y axis
-; - `e`: x axis
-;
-; Return:
-; - `de`: offset calculed
-;
-; Destroy registers `af`, `bc`, `de`, `hl`
-CalcOffset:
-    ld h, 0
-    ld d, 0
-    push de
-    push hl
-
-    ld hl, 3
-    pop de
-    call Multiply  ; bc = de * hl
-
-    pop de
-    ld a, c
-    add a, e
-
-    ld d, 0
-    ld e, a
-
-    ret
-
-MarkPlayer:
-.offset
-    ld a, [cursor_y]
-    ld l, a
-    ld a, [cursor_x]
-    ld e, a
-    call CalcOffset
-    ld a, [player_num]
-    add a, 1
-    ld c, a
-    call Mark
-    ret
-
-; Mark a move.
-;
-; Arguments:
-;
-; - `de`: offset to be marked
-; - `c`: value to be marked
-;
-; Destroy registers `af`, `bc`, `de`, `hl`
-Mark:
-.store
-    ld hl, marks
-    add hl, de
-
-    ld a, c
-    ld [hl], a
-.update
-    ; TODO: put this render update outside function
-    call TurnOffLCD
-    call RenderMarks
-    call TurnOnLCD
-
-    ret
-
-CursorLeft:
-    ld a, [cursor_x]
-.if
-    and a, a  ; cp a, 0
-    jp z, .end
-.then
-    sub a, 1
-    ld [cursor_x], a
-    call TurnOffLCD
-    call RenderCursor
-    call TurnOnLCD
-.end
-    ret
-
-CursorRight:
-    ld a, [cursor_x]
-.if
-    cp a, 2
-    jp nc, .end
-.then
-    add a, 1
-    ld [cursor_x], a
-    call TurnOffLCD
-    call RenderCursor
-    call TurnOnLCD
-.end
-    ret
-
-CursorUp:
-    ld a, [cursor_y]
-.if
-    and a, a  ; cp a, 0
-    jp z, .end
-.then
-    sub a, 1
-    ld [cursor_y], a
-    call TurnOffLCD
-    call RenderCursor
-    call TurnOnLCD
-.end
-    ret
-
-CursorDown:
-    ld a, [cursor_y]
-.if
-    cp a, 2
-    jp nc, .end
-.then
-    add a, 1
-    ld [cursor_y], a
-    call TurnOffLCD
-    call RenderCursor
-    call TurnOnLCD
-.end
-    ret
 
 VerifyWinner:
     ld a, 0

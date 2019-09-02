@@ -6,18 +6,11 @@ SECTION "Game code", ROM0
 ; 	call ClearORM
 ; 	call SetPalettes
 ; 	call LoadFont
-; 	call RenderTurnP1
-; 	call RenderGrid
-; 	call RenderScore
-; 	call UpdateScore
-; 	call RenderCursor
-; 	call RenderMarks
 ; 	call TurnOnLCD
-; 	call EnableVBlank
-; 	call EnableTimerInt
-; 	ei
-; 	jp LogicEntry
+; 	call SetupGame
+; 	jp PlayerTurn
 
+; Multiplayer
 Start:
 	call CleanWRAM
 	call TurnOffLCD
@@ -25,15 +18,4 @@ Start:
 	call SetPalettes
 	call LoadFont
 	call TurnOnLCD
-	call SetupGame
-	jp PlayerTurn
-
-; Multiplayer
-; Start:
-; 	call CleanWRAM
-; 	call TurnOffLCD
-; 	call ClearORM
-; 	call SetPalettes
-; 	call LoadFont
-; 	call TurnOnLCD
-; 	jp AwaitConnection
+	jp AwaitConnection

@@ -8,6 +8,9 @@ default: build/$(ROM_NAME).gb
 
 run: build/$(ROM_NAME).gb
 	$(EMULATOR) $<
+run-linked: build/$(ROM_NAME).gb
+	$(EMULATOR) $< -set winx=300 -listen &
+	$(EMULATOR) $< -set winx=800 -connect &
 clean:
 	@rm -r build
 

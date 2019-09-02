@@ -1,5 +1,7 @@
 SECTION "Variables", WRAM0
 
+cursor:
+	ds 1
 cursor_y:
 	ds 1
 cursor_x:

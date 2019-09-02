@@ -19,9 +19,10 @@ INCLUDE "src/data/grid.asm"
 INCLUDE "src/data/scoreboard.asm"
 INCLUDE "src/data/wram.asm"
 
-INCLUDE "src/game_logic/logic.asm"
 INCLUDE "src/game_logic/connection.asm"
+INCLUDE "src/game_logic/grid_actions.asm"
 INCLUDE "src/game_logic/init.asm"
+INCLUDE "src/game_logic/logic.asm"
 
 INCLUDE "src/graphics/assets.asm"
 INCLUDE "src/graphics/cursor.asm"
