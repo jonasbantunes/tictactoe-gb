@@ -46,7 +46,7 @@ PlayerTurn
     bit PADB_A, a
     jp z, .end
 .thenA
-    call Mark
+    call MarkPlayer
     call ChangePlayer
     jp Decision
 .end
@@ -61,9 +61,17 @@ OpponentTurn:
     call DisableTimerInt
     call DisableVBlank
     call EnableSerial
-    ei
 .lockup
+    ei
     halt
+    di
+; .if
+;     ld a, [serial_turn]
+;     cp a, 1  ; check if is the internal clock turn
+;     jp nz, .end
+; .then
+
+; .end
     jp .lockup
 
 Decision:
@@ -112,29 +120,66 @@ ChangePlayer:
     ld [player_turn], a
     ret 
 
-Mark:
-.offset
-    ld hl, 3
+; Calculate offset from cursor axis.
+;
+; Arguments:
+;
+; - `l`: y axis
+; - `e`: x axis
+;
+; Return:
+; - `de`: offset calculed
+;
+; Destroy registers `af`, `bc`, `de`, `hl`
+CalcOffset:
+    ld h, 0
     ld d, 0
-    ld a, [cursor_y]
-    ld e, a
-    call Multiply  ; bc = de * hl
-    
-    ld a, [cursor_x]
-    ld b, a
-    ld a, c
-    add a, b
-.store
-    ld hl, marks
-    ld e, a
-    ld d, 0
-    add hl, de
+    push de
+    push hl
 
-    ; ld a, [player_turn]
+    ld hl, 3
+    pop de
+    call Multiply  ; bc = de * hl
+
+    pop de
+    ld a, c
+    add a, e
+
+    ld d, 0
+    ld e, a
+
+    ret
+
+MarkPlayer:
+.offset
+    ld a, [cursor_y]
+    ld l, a
+    ld a, [cursor_x]
+    ld e, a
+    call CalcOffset
     ld a, [player_num]
     add a, 1
+    ld c, a
+    call Mark
+    ret
+
+; Mark a move.
+;
+; Arguments:
+;
+; - `de`: offset to be marked
+; - `c`: value to be marked
+;
+; Destroy registers `af`, `bc`, `de`, `hl`
+Mark:
+.store
+    ld hl, marks
+    add hl, de
+
+    ld a, c
     ld [hl], a
 .update
+    ; TODO: put this render update outside function
     call TurnOffLCD
     call RenderMarks
     call TurnOnLCD
