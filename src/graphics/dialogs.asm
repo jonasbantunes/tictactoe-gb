@@ -28,6 +28,12 @@ RenderYouLost:
 	call RenderString
 	ret
 
+RenderDrawGame:
+	ld de, msg_draw
+	ld hl, _SCRN0
+	call RenderString
+	ret
+
 RenderTurnP1:
 	ld de, msg_turn_p1
 	ld hl, _SCRN0

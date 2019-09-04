@@ -14,6 +14,10 @@ msg_won:
 	db "      YOU WON!      "
 	db "                    "
 	db 0
+msg_draw:
+	db "     DRAW  GAME     "
+	db "                    "
+	db 0
 msg_awaiting:
 	db "AWAITING  CONNECTION"
 	db "                    "

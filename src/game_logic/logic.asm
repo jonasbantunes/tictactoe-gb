@@ -44,12 +44,31 @@ PlayerTurn
     bit PADB_A, a
     jp z, .end
 .thenA
+    ; call MarkPlayer
+    ; call SendMark
+    ; call ChangePlayer
+    ; jp Decision
+    jp CheckPlayer
+.end
+    jp .lockup
+
+CheckPlayer:
+    ld hl, marks
+    ld d, 0
+    ld a, [cursor]
+    ld e, a
+    add hl, de
+.ifNotMarked
+    ld a, [hl]
+    and a, a ; cp a, 0
+    jp nz, .else
+.then
     call MarkPlayer
     call SendMark
     call ChangePlayer
     jp Decision
-.end
-    jp .lockup
+.else
+    jp PlayerTurn
 
 OpponentTurn:
     call TurnOffLCD
@@ -76,10 +95,17 @@ OpponentTurn:
     jp .lockup
 
 Decision:
+.ifDraw
+    ld a, [turns_left]
+    and a, a ; cp a, 0
+    jp nz, .endDraw
+.thenDraw
+    jp ShowDraw
+.endDraw
+.ifWinner
     call VerifyWinner
     ld a, [winner]
     and a, a ; cp a, 0
-.ifWinner
     jp z, .endWinner
 .thenWinner
     jp ShowWinner
@@ -95,6 +121,15 @@ Decision:
 .elsePlayerTurn:
     jp OpponentTurn
 
+
+ShowDraw:
+    call TurnOffLCD
+    call HideCursor
+    call RenderDrawGame
+    call TurnOnLCD
+.lockup
+    halt
+    jp .lockup
 
 ShowWinner
     call TurnOffLCD
@@ -123,6 +158,10 @@ ChangePlayer:
     ld a, [player_turn]
     xor a, $01
     ld [player_turn], a
+
+    ld a, [turns_left]
+    dec a
+    ld [turns_left], a
     ret 
 
 VerifyWinner:
@@ -236,6 +275,13 @@ ld c, a
     ret
 
 SetupGame:
+    ld a, 0
+    ld [player_turn], a
+    ld a, 0
+    ld [player_num], a
+    ld a, 9
+    ld [turns_left], a
+    
 	call TurnOffLCD
 	call RenderGrid
 	call RenderScore
@@ -243,9 +289,4 @@ SetupGame:
 	call RenderCursor
 	call RenderMarks
 	call TurnOnLCD
-
-    ld a, 0
-    ld [player_turn], a
-    ld a, 0
-    ld [player_num], a
     ret
