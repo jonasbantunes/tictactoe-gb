@@ -108,6 +108,10 @@ Decision:
     and a, a ; cp a, 0
     jp z, .endWinner
 .thenWinner
+    call AddWinnerScore
+    call TurnOffLCD
+    call UpdateScore
+    call TurnOnLCD
     jp ShowWinner
 .endWinner
 .ifPlayerTurn:
@@ -155,6 +159,19 @@ ShowWinner
     halt
     ; jp .lockup
     jp AwaitConnection
+
+AddWinnerScore:
+    ld hl, scores
+    ld d, 0
+    ld a, [winner]
+    dec a
+    ld e, a
+    add hl, de
+
+    ld a, [hl]
+    inc a
+    ld [hl], a
+    ret
 
 ChangePlayer:
     ld a, [player_turn]
