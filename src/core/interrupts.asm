@@ -28,12 +28,12 @@ TimerInt:
     ld a, [counter]
     inc a
 .if
-    cp a, $4
+    cp a, $3
     jp c, .else
 .then
     call TurnOffLCD
     call ToggleCursor
-    call ToggleMarks
+    ; call ToggleMarks
     call TurnOnLCD
 
     ld a, 0

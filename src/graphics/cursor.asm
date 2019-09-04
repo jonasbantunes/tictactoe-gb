@@ -49,3 +49,8 @@ HideCursor:
 	ld a, 0
 	ld [_OAMRAM + 2], a
 	ret
+
+ShowCursor:
+	ld a, $40
+	ld [_OAMRAM + 2], a
+	ret
