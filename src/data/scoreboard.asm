@@ -1,4 +1,4 @@
 scoreboard:
-	db "                    "
-	db "P1: 0          P2: 0"
+	; db "                    "
+	db "X:              O:  "
 	db 0

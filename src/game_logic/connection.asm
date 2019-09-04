@@ -1,5 +1,10 @@
 SECTION "Connection", ROM0
 
+SetupConnection:
+    ld a, $FF
+    ld [player_num], a
+    jp AwaitConnection
+
 AwaitConnection:
     call EnableVBlank
     call EnableSerial
@@ -29,10 +34,14 @@ StartConnection:
     call SendData
 
     call SetupGame
-    ld a, 0
-    ld [player_turn], a
+.ifFistGame
+    ld a, [player_num]
+    cp a, $FF
+    jp nz, .end
+.then
     ld a, 0
     ld [player_num], a
+.end
     jp Decision
 
 AcceptConnection:
@@ -40,8 +49,12 @@ AcceptConnection:
     call SendData
 
     call SetupGame
-    ld a, 0
-    ld [player_turn], a
+.ifFistGame
+    ld a, [player_num]
+    cp a, $FF
+    jp nz, .end
+.then
     ld a, 1
     ld [player_num], a
+.end
     jp Decision

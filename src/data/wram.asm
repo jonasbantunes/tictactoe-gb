@@ -9,21 +9,18 @@ cursor_x:
 marks:
 	ds 9
 marks_end:
-marks_blink:
-	ds 9
-marks_blink_end:
 turns_left:
 	ds 1
 winner:
 	ds 1
+player_turn:
+	ds 1
 
+player_num:
+	ds 1
 scores:
 	ds 2
 scores_end:
-player_num:
-	ds 1
-player_turn:
-	ds 1
 
 joybuttons:
 	ds 1
@@ -37,3 +34,9 @@ serial_turn:
 
 counter:
 	ds 1
+
+; DEPRECIATE
+
+marks_blink:
+	ds 9
+marks_blink_end:

@@ -9,4 +9,4 @@ Start:
 	call RenderAwaiting
 	call TurnOnLCD
 
-	jp AwaitConnection
+	jp SetupConnection

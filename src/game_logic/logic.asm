@@ -129,7 +129,8 @@ ShowDraw:
     call TurnOnLCD
 .lockup
     halt
-    jp .lockup
+    ; jp .lockup
+    jp AwaitConnection
 
 ShowWinner
     call TurnOffLCD
@@ -152,7 +153,8 @@ ShowWinner
     ei
 .lockup
     halt
-    jp .lockup
+    ; jp .lockup
+    jp AwaitConnection
 
 ChangePlayer:
     ld a, [player_turn]
@@ -275,10 +277,18 @@ ld c, a
     ret
 
 SetupGame:
-    ld a, 0
-    ld [player_turn], a
-    ld a, 0
-    ld [player_num], a
+    ld hl, cursor
+    ld de, player_num - cursor
+.while
+    ld a, d
+    or a, e
+    jp z, .end
+.do
+    ld [hl], 0
+    inc hl
+    dec de
+    jp .while
+.end
     ld a, 9
     ld [turns_left], a
     
